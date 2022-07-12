@@ -4,23 +4,26 @@ export enum CardType {
   RIGHT_TURN = 'right-turn',
   LEFT_TURN = 'left-turn',
   INTERSECTION = 'intersection',
-  T_INTERSECTION = 't-intersection',
+  HORIZONTAL_T_INTERSECTION = 'horizontal-t-intersection',
+  VERTICAL_T_INTERSECTION = 'vertical-t-intersection',
   ADD_CARD_BUTTON = 'add-card-button',
+  HORIZONTAL_DEAD_END = 'horizontal-dead-end',
+  VERTICAL_DEAD_END = 'vertical-dead-end',
 }
 
 export class GameCard {
   x: number
   y: number
-  cardType: CardType
+  type: CardType
   canConnectBack: boolean = false
   canConnectFront: boolean = false
   canConnectLeft: boolean = false
   canConnectRight: boolean = false
 
-  constructor(x: number, y: number, cardType: CardType = CardType.INTERSECTION) {
+  constructor(x: number, y: number, cardType: CardType, card?: GameCard) {
     this.x = x
     this.y = y
-    this.cardType = cardType
+    this.type = cardType
     switch (cardType) {
       case CardType.HORIZONTAL:
         this.canConnectBack = true
@@ -44,11 +47,29 @@ export class GameCard {
         this.canConnectLeft = true
         this.canConnectRight = true
         break
-      case CardType.T_INTERSECTION:
+      case CardType.HORIZONTAL_T_INTERSECTION:
         this.canConnectBack = true
         this.canConnectLeft = true
         this.canConnectRight = true
         break
+      case CardType.VERTICAL_T_INTERSECTION:
+        this.canConnectBack = true
+        this.canConnectFront = true
+        this.canConnectLeft = true
+        break
+      case CardType.HORIZONTAL_DEAD_END:
+        this.canConnectBack = true
+        break
+      case CardType.VERTICAL_DEAD_END:
+        this.canConnectLeft = true
+        break
+    }
+
+    if (card) {
+      this.canConnectBack = card.canConnectBack
+      this.canConnectFront = card.canConnectFront
+      this.canConnectLeft = card.canConnectLeft
+      this.canConnectRight = card.canConnectRight
     }
   }
 
@@ -76,11 +97,12 @@ export class GameCard {
   }
 }
 
-export class AddGameCardButton extends GameCard {
-  possibleGameCards: GameCard[]
+export class InHandGameCard extends GameCard {
+  isActive: boolean = false
+}
 
-  constructor(x: number, y: number, possibleGameCards: GameCard[]) {
+export class AddGameCardButton extends GameCard {
+  constructor(x: number, y: number) {
     super(x, y, CardType.ADD_CARD_BUTTON)
-    this.possibleGameCards = possibleGameCards
   }
 }
